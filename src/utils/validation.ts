@@ -6,8 +6,10 @@ export function validateName(value: string): string | null {
 }
 
 export function validatePhone(value: string): string | null {
-  const regex = /^(\+7|8)\d{10}$/;
-  if (regex.test(value)) {
+  // раньше был regex /^(\+7|8)\d{10}$/, но он не пропускал номера
+  // с пробелами/скобками/дефисами — поэтому сначала чистим строку до цифр
+  const digits = value.replace(/\D/g, '');
+  if (digits.length === 11 && (digits[0] === '7' || digits[0] === '8')) {
     return null;
   }
   return 'Введите номер в формате +7XXXXXXXXXX';
