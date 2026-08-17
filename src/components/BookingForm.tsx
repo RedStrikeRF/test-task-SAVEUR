@@ -1,107 +1,128 @@
 import { FormEvent, useState } from 'react';
-import {
-  TIME_SLOTS,
-  validateDate,
-  validateGuests,
-  validateName,
-  validatePhone,
-  validateTime,
-} from '@/utils/validation';
+import { BookingFormData, BookingFormErrors } from '@/types/booking';
+import { TIME_SLOTS, validateBookingForm } from '@/utils/validation';
 import styles from './BookingForm.module.css';
 
-export default function BookingForm() {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [guests, setGuests] = useState(2);
+interface BookingFormProps {
+  onSubmit: (data: BookingFormData) => void;
+  isSubmitting: boolean;
+}
 
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [phoneError, setPhoneError] = useState<string | null>(null);
-  const [dateError, setDateError] = useState<string | null>(null);
-  const [timeError, setTimeError] = useState<string | null>(null);
-  const [guestsError, setGuestsError] = useState<string | null>(null);
+const emptyFormData: BookingFormData = {
+  name: '',
+  phone: '',
+  date: '',
+  time: '',
+  guests: 2,
+};
 
-  const handleSubmit = (e: FormEvent) => {
+export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps) {
+  const [formData, setFormData] = useState<BookingFormData>(emptyFormData);
+  const [errors, setErrors] = useState<BookingFormErrors>({});
+
+  const handleChange = (field: keyof BookingFormData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBlur = () => {
+    setErrors(validateBookingForm(formData));
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const nErr = validateName(name);
-    const pErr = validatePhone(phone);
-    const dErr = validateDate(date);
-    const tErr = validateTime(time);
-    const gErr = validateGuests(guests);
+    const formErrors = validateBookingForm(formData);
+    setErrors(formErrors);
 
-    setNameError(nErr);
-    setPhoneError(pErr);
-    setDateError(dErr);
-    setTimeError(tErr);
-    setGuestsError(gErr);
-
-    if (!nErr && !pErr && !dErr && !tErr && !gErr) {
-      console.log({ name, phone, date, time, guests });
+    if (Object.keys(formErrors).length === 0) {
+      onSubmit(formData);
     }
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.field}>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={() => setNameError(validateName(name))}
-          placeholder="Имя гостя"
-        />
-        {nameError && <p className={styles.error}>{nameError}</p>}
-      </div>
+    <div className={styles.card}>
+      <h1 className={styles.title}>Бронирование столика</h1>
 
-      <div className={styles.field}>
-        <input
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          onBlur={() => setPhoneError(validatePhone(phone))}
-          placeholder="+7XXXXXXXXXX"
-        />
-        {phoneError && <p className={styles.error}>{phoneError}</p>}
-      </div>
+      <form className={styles.form} onSubmit={handleSubmit} noValidate>
+        <div className={styles.field}>
+          <label className={styles.label}>Имя гостя</label>
+          <input
+            className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
+            value={formData.name}
+            onChange={(e) => handleChange('name', e.target.value)}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.name && <p className={styles.errorText}>{errors.name}</p>}
+        </div>
 
-      <div className={styles.field}>
-        <input
-          type="date"
-          value={date}
-          min={new Date().toISOString().split('T')[0]}
-          onChange={(e) => setDate(e.target.value)}
-          onBlur={() => setDateError(validateDate(date))}
-        />
-        {dateError && <p className={styles.error}>{dateError}</p>}
-      </div>
+        <div className={styles.field}>
+          <label className={styles.label}>Номер телефона</label>
+          <input
+            className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
+            value={formData.phone}
+            placeholder="+7XXXXXXXXXX"
+            onChange={(e) => handleChange('phone', e.target.value)}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.phone && <p className={styles.errorText}>{errors.phone}</p>}
+        </div>
 
-      <div className={styles.field}>
-        <select
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          onBlur={() => setTimeError(validateTime(time))}
-        >
-          <option value="">Выберите время</option>
-          {TIME_SLOTS.map((slot) => (
-            <option key={slot} value={slot}>
-              {slot}
-            </option>
-          ))}
-        </select>
-        {timeError && <p className={styles.error}>{timeError}</p>}
-      </div>
+        <div className={styles.row}>
+          <div className={styles.field}>
+            <label className={styles.label}>Дата</label>
+            <input
+              className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
+              type="date"
+              min={new Date().toISOString().split('T')[0]}
+              value={formData.date}
+              onChange={(e) => handleChange('date', e.target.value)}
+              onBlur={handleBlur}
+              disabled={isSubmitting}
+            />
+            {errors.date && <p className={styles.errorText}>{errors.date}</p>}
+          </div>
 
-      <div className={styles.field}>
-        <input
-          type="number"
-          value={guests}
-          onChange={(e) => setGuests(Number(e.target.value))}
-          onBlur={() => setGuestsError(validateGuests(guests))}
-        />
-        {guestsError && <p className={styles.error}>{guestsError}</p>}
-      </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Время</label>
+            <select
+              className={`${styles.select} ${errors.time ? styles.inputError : ''}`}
+              value={formData.time}
+              onChange={(e) => handleChange('time', e.target.value)}
+              onBlur={handleBlur}
+              disabled={isSubmitting}
+            >
+              <option value="">Выберите время</option>
+              {TIME_SLOTS.map((slot) => (
+                <option key={slot} value={slot}>
+                  {slot}
+                </option>
+              ))}
+            </select>
+            {errors.time && <p className={styles.errorText}>{errors.time}</p>}
+          </div>
+        </div>
 
-      <button type="submit">Забронировать</button>
-    </form>
+        <div className={styles.field}>
+          <label className={styles.label}>Количество гостей</label>
+          <input
+            className={`${styles.input} ${errors.guests ? styles.inputError : ''}`}
+            type="number"
+            min={1}
+            max={12}
+            value={formData.guests}
+            onChange={(e) => handleChange('guests', Number(e.target.value))}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guests && <p className={styles.errorText}>{errors.guests}</p>}
+        </div>
+
+        <button className={styles.submitButton} type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Бронирую...' : 'Забронировать столик'}
+        </button>
+      </form>
+    </div>
   );
 }

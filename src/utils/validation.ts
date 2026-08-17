@@ -1,3 +1,5 @@
+import { BookingFormData, BookingFormErrors } from '@/types/booking';
+
 export function validateName(value: string): string | null {
   if (value.trim().length < 2) {
     return 'Введите имя (минимум 2 символа)';
@@ -48,4 +50,25 @@ export function validateGuests(value: number): string | null {
     return 'Количество гостей от 1 до 12';
   }
   return null;
+}
+
+export function validateBookingForm(data: BookingFormData): BookingFormErrors {
+  const errors: BookingFormErrors = {};
+
+  const nameError = validateName(data.name);
+  if (nameError) errors.name = nameError;
+
+  const phoneError = validatePhone(data.phone);
+  if (phoneError) errors.phone = phoneError;
+
+  const dateError = validateDate(data.date);
+  if (dateError) errors.date = dateError;
+
+  const timeError = validateTime(data.time);
+  if (timeError) errors.time = timeError;
+
+  const guestsError = validateGuests(data.guests);
+  if (guestsError) errors.guests = guestsError;
+
+  return errors;
 }
