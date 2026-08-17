@@ -46,10 +46,13 @@ npm run test
 
 ```
 booking-form/
-  BookingForm.tsx        — сама разметка
-  useBookingForm.ts      — весь стейт и обработчики
-  validation.ts
-  types.ts
+  ui/                      - лишь ui компонента
+    BookingForm.tsx        - сама разметка
+    BookingForm.module.css - css над разметкой
+  model/                   - весь стейт и обработчики
+    useBookingForm.ts      
+    validation.ts
+    types.ts
 ```
 
 Тогда компонент занимался бы только версткой, а весь стейт, обработчики и эффекты жили бы в отдельном хуке — и то, и другое проще читать по отдельности.
