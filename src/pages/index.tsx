@@ -1,7 +1,9 @@
+import Head from 'next/head';
 import { useState } from 'react';
 import BookingForm from '@/components/BookingForm';
 import ConfirmationScreen from '@/components/ConfirmationScreen';
 import { BookingFormData, BookingStatus } from '@/types/booking';
+import styles from './index.module.css';
 
 export default function Home() {
   const [status, setStatus] = useState<BookingStatus>('idle');
@@ -21,12 +23,22 @@ export default function Home() {
   };
 
   return (
-    <main style={{ padding: 40 }}>
-      {status === 'success' && booking ? (
-        <ConfirmationScreen booking={booking} onReset={handleReset} />
-      ) : (
-        <BookingForm onSubmit={handleSubmit} isSubmitting={status === 'loading'} />
-      )}
-    </main>
+    <>
+      <Head>
+        <title>SAVEUR — Бронирование столика</title>
+        <meta
+          name="description"
+          content="Онлайн-бронирование столика в ресторане SAVEUR"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <main className={styles.page}>
+        {status === 'success' && booking ? (
+          <ConfirmationScreen booking={booking} onReset={handleReset} />
+        ) : (
+          <BookingForm onSubmit={handleSubmit} isSubmitting={status === 'loading'} />
+        )}
+      </main>
+    </>
   );
 }

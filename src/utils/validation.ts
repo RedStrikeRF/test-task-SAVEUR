@@ -1,5 +1,21 @@
 import { BookingFormData, BookingFormErrors } from '@/types/booking';
 
+export const TIME_SLOTS: string[] = Array.from({ length: 11 }, (_, i) => {
+  const hour = 12 + i;
+  return `${String(hour).padStart(2, '0')}:00`;
+});
+
+export const MIN_GUESTS = 1;
+export const MAX_GUESTS = 12;
+
+function todayISODate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function validateName(value: string): string | null {
   if (value.trim().length < 2) {
     return 'Введите имя (минимум 2 символа)';
@@ -8,8 +24,6 @@ export function validateName(value: string): string | null {
 }
 
 export function validatePhone(value: string): string | null {
-  // раньше был regex /^(\+7|8)\d{10}$/, но он не пропускал номера
-  // с пробелами/скобками/дефисами — поэтому сначала чистим строку до цифр
   const digits = value.replace(/\D/g, '');
   if (digits.length === 11 && (digits[0] === '7' || digits[0] === '8')) {
     return null;
@@ -21,22 +35,11 @@ export function validateDate(value: string): string | null {
   if (!value) {
     return 'Выберите дату';
   }
+  if (value < todayISODate()) {
+    return 'Дата не может быть раньше сегодняшней';
+  }
   return null;
 }
-
-export const TIME_SLOTS = [
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00',
-  '16:00',
-  '17:00',
-  '18:00',
-  '19:00',
-  '20:00',
-  '21:00',
-  '22:00',
-];
 
 export function validateTime(value: string): string | null {
   if (!TIME_SLOTS.includes(value)) {
@@ -46,8 +49,8 @@ export function validateTime(value: string): string | null {
 }
 
 export function validateGuests(value: number): string | null {
-  if (!Number.isInteger(value) || value < 1 || value > 12) {
-    return 'Количество гостей от 1 до 12';
+  if (!Number.isInteger(value) || value < MIN_GUESTS || value > MAX_GUESTS) {
+    return `Количество гостей от ${MIN_GUESTS} до ${MAX_GUESTS}`;
   }
   return null;
 }

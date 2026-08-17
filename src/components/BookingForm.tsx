@@ -1,6 +1,19 @@
 import { FormEvent, useState } from 'react';
-import { BookingFormData, BookingFormErrors } from '@/types/booking';
-import { TIME_SLOTS, validateBookingForm } from '@/utils/validation';
+import {
+  BookingFormData,
+  BookingFormErrors,
+} from '@/types/booking';
+import {
+  MAX_GUESTS,
+  MIN_GUESTS,
+  TIME_SLOTS,
+  validateBookingForm,
+  validateDate,
+  validateGuests,
+  validateName,
+  validatePhone,
+  validateTime,
+} from '@/utils/validation';
 import styles from './BookingForm.module.css';
 
 interface BookingFormProps {
@@ -16,20 +29,53 @@ const emptyFormData: BookingFormData = {
   guests: 2,
 };
 
+function todayISODate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps) {
   const [formData, setFormData] = useState<BookingFormData>(emptyFormData);
   const [errors, setErrors] = useState<BookingFormErrors>({});
 
-  const handleChange = (field: keyof BookingFormData, value: string | number) => {
+  const validateField = (field: keyof BookingFormData, value: string | number) => {
+    let error: string | null = null;
+    switch (field) {
+      case 'name':
+        error = validateName(String(value));
+        break;
+      case 'phone':
+        error = validatePhone(String(value));
+        break;
+      case 'date':
+        error = validateDate(String(value));
+        break;
+      case 'time':
+        error = validateTime(String(value));
+        break;
+      case 'guests':
+        error = validateGuests(Number(value));
+        break;
+    }
+    setErrors((prev) => ({ ...prev, [field]: error ?? undefined }));
+  };
+
+  const handleChange = (
+    field: keyof BookingFormData,
+    value: string | number,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleBlur = () => {
-    setErrors(validateBookingForm(formData));
+  const handleBlur = (field: keyof BookingFormData) => {
+    validateField(field, formData[field]);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     const formErrors = validateBookingForm(formData);
     setErrors(formErrors);
@@ -42,28 +88,40 @@ export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps
   return (
     <div className={styles.card}>
       <h1 className={styles.title}>Бронирование столика</h1>
+      <p className={styles.subtitle}>
+        Заполните форму, и мы забронируем для вас столик
+      </p>
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
-          <label className={styles.label}>Имя гостя</label>
+          <label className={styles.label} htmlFor="name">
+            Имя гостя
+          </label>
           <input
+            id="name"
             className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
+            type="text"
             value={formData.name}
+            placeholder="Иван Иванов"
             onChange={(e) => handleChange('name', e.target.value)}
-            onBlur={handleBlur}
+            onBlur={() => handleBlur('name')}
             disabled={isSubmitting}
           />
           {errors.name && <p className={styles.errorText}>{errors.name}</p>}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Номер телефона</label>
+          <label className={styles.label} htmlFor="phone">
+            Номер телефона
+          </label>
           <input
+            id="phone"
             className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
+            type="tel"
             value={formData.phone}
             placeholder="+7XXXXXXXXXX"
             onChange={(e) => handleChange('phone', e.target.value)}
-            onBlur={handleBlur}
+            onBlur={() => handleBlur('phone')}
             disabled={isSubmitting}
           />
           {errors.phone && <p className={styles.errorText}>{errors.phone}</p>}
@@ -71,29 +129,37 @@ export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps
 
         <div className={styles.row}>
           <div className={styles.field}>
-            <label className={styles.label}>Дата</label>
+            <label className={styles.label} htmlFor="date">
+              Дата
+            </label>
             <input
+              id="date"
               className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
               type="date"
-              min={new Date().toISOString().split('T')[0]}
+              min={todayISODate()}
               value={formData.date}
               onChange={(e) => handleChange('date', e.target.value)}
-              onBlur={handleBlur}
+              onBlur={() => handleBlur('date')}
               disabled={isSubmitting}
             />
             {errors.date && <p className={styles.errorText}>{errors.date}</p>}
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Время</label>
+            <label className={styles.label} htmlFor="time">
+              Время
+            </label>
             <select
+              id="time"
               className={`${styles.select} ${errors.time ? styles.inputError : ''}`}
               value={formData.time}
               onChange={(e) => handleChange('time', e.target.value)}
-              onBlur={handleBlur}
+              onBlur={() => handleBlur('time')}
               disabled={isSubmitting}
             >
-              <option value="">Выберите время</option>
+              <option value="" disabled>
+                Выберите время
+              </option>
               {TIME_SLOTS.map((slot) => (
                 <option key={slot} value={slot}>
                   {slot}
@@ -105,21 +171,25 @@ export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>Количество гостей</label>
+          <label className={styles.label} htmlFor="guests">
+            Количество гостей
+          </label>
           <input
+            id="guests"
             className={`${styles.input} ${errors.guests ? styles.inputError : ''}`}
             type="number"
-            min={1}
-            max={12}
+            min={MIN_GUESTS}
+            max={MAX_GUESTS}
             value={formData.guests}
             onChange={(e) => handleChange('guests', Number(e.target.value))}
-            onBlur={handleBlur}
+            onBlur={() => handleBlur('guests')}
             disabled={isSubmitting}
           />
           {errors.guests && <p className={styles.errorText}>{errors.guests}</p>}
         </div>
 
         <button className={styles.submitButton} type="submit" disabled={isSubmitting}>
+          {isSubmitting && <span className={styles.spinner} aria-hidden="true" />}
           {isSubmitting ? 'Бронирую...' : 'Забронировать столик'}
         </button>
       </form>
