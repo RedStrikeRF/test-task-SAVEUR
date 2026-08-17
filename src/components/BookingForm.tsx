@@ -4,6 +4,7 @@ import {
   BookingFormErrors,
 } from '@/types/booking';
 import {
+  formatName,
   MAX_GUESTS,
   MIN_GUESTS,
   TIME_SLOTS,
@@ -71,6 +72,12 @@ export default function BookingForm({ onSubmit, isSubmitting }: BookingFormProps
   };
 
   const handleBlur = (field: keyof BookingFormData) => {
+    if (field === 'name') {
+      const formatted = formatName(formData.name);
+      setFormData((prev) => ({ ...prev, name: formatted }));
+      validateField('name', formatted);
+      return;
+    }
     validateField(field, formData[field]);
   };
 

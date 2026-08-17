@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validatePhone } from './validation';
+import { formatName, validatePhone } from './validation';
 
 describe('validatePhone', () => {
   it('accepts +7XXXXXXXXXX format', () => {
@@ -24,5 +24,19 @@ describe('validatePhone', () => {
 
   it('rejects empty input', () => {
     expect(validatePhone('')).not.toBeNull();
+  });
+});
+
+describe('formatName', () => {
+  it('capitalizes each word', () => {
+    expect(formatName('иван иванов')).toBe('Иван Иванов');
+  });
+
+  it('lowercases the rest of the letters', () => {
+    expect(formatName('ИВАН ИВАНОВ')).toBe('Иван Иванов');
+  });
+
+  it('collapses extra spaces', () => {
+    expect(formatName('  иван   иванов  ')).toBe('Иван Иванов');
   });
 });

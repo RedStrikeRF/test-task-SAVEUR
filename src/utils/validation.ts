@@ -23,6 +23,17 @@ export function validateName(value: string): string | null {
   return null;
 }
 
+// приводит имя к виду "Иван Иванов" — каждое слово с большой буквы,
+// остальные буквы строчные, лишние пробелы убираются
+export function formatName(value: string): string {
+  return value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 const RUSSIAN_PHONE_REGEX = /^[78]\d{10}$/;
 
 export function validatePhone(value: string): string | null {
