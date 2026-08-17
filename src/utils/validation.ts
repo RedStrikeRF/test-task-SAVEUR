@@ -24,6 +24,7 @@ export function validateName(value: string): string | null {
 }
 
 export function validatePhone(value: string): string | null {
+  // убираем пробелы, скобки и дефисы, проверяем только цифры
   const digits = value.replace(/\D/g, '');
   if (digits.length === 11 && (digits[0] === '7' || digits[0] === '8')) {
     return null;
