@@ -33,6 +33,14 @@ describe('validatePhone', () => {
   it('rejects a plus sign that is not at the start', () => {
     expect(validatePhone('89+261234567')).not.toBeNull();
   });
+
+  it('rejects a bare 7-number without the plus sign', () => {
+    expect(validatePhone('79227515352')).not.toBeNull();
+  });
+
+  it('rejects +8 (plus sign is only valid with 7)', () => {
+    expect(validatePhone('+89261234567')).not.toBeNull();
+  });
 });
 
 describe('formatName', () => {

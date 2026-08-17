@@ -37,19 +37,23 @@ export function formatName(value: string): string {
 // разрешаем только цифры, пробелы, скобки и дефисы (+ в начале) —
 // никаких букв и прочего мусора, чтобы не проходили строки вроде "abc89261234567"
 const PHONE_ALLOWED_CHARS_REGEX = /^\+?[\d\s()-]+$/;
-const PHONE_DIGITS_REGEX = /^[78]\d{10}$/;
+
+// строго "+7" (с плюсом) или "8" (без плюса) — бывший "+8" или голый "7"
+// без плюса не подходят, хотя цифры после кода те же самые
+const PHONE_FORMAT_REGEX = /^(\+7\d{10}|8\d{10})$/;
 
 export function validatePhone(value: string): string | null {
   const trimmed = value.trim();
 
   if (!trimmed || !PHONE_ALLOWED_CHARS_REGEX.test(trimmed)) {
-    return 'Введите номер в формате +7XXXXXXXXXX';
+    return 'Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX';
   }
 
-  const digits = trimmed.replace(/\D/g, '');
+  // убираем только форматирующие символы, "+" в начале не трогаем
+  const normalized = trimmed.replace(/[\s()-]/g, '');
 
-  if (!PHONE_DIGITS_REGEX.test(digits)) {
-    return 'Введите номер в формате +7XXXXXXXXXX';
+  if (!PHONE_FORMAT_REGEX.test(normalized)) {
+    return 'Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX';
   }
 
   return null;
