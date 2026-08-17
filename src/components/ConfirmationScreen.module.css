@@ -80,3 +80,10 @@
 .button:active {
   transform: scale(0.99);
 }
+
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 18px;
+    border-radius: 12px;
+  }
+}
