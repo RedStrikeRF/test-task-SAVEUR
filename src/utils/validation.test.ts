@@ -25,6 +25,14 @@ describe('validatePhone', () => {
   it('rejects empty input', () => {
     expect(validatePhone('')).not.toBeNull();
   });
+
+  it('rejects letters mixed into the number', () => {
+    expect(validatePhone('abc89261234567')).not.toBeNull();
+  });
+
+  it('rejects a plus sign that is not at the start', () => {
+    expect(validatePhone('89+261234567')).not.toBeNull();
+  });
 });
 
 describe('formatName', () => {

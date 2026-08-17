@@ -34,12 +34,21 @@ export function formatName(value: string): string {
     .join(' ');
 }
 
-const RUSSIAN_PHONE_REGEX = /^[78]\d{10}$/;
+// разрешаем только цифры, пробелы, скобки и дефисы (+ в начале) —
+// никаких букв и прочего мусора, чтобы не проходили строки вроде "abc89261234567"
+const PHONE_ALLOWED_CHARS_REGEX = /^\+?[\d\s()-]+$/;
+const PHONE_DIGITS_REGEX = /^[78]\d{10}$/;
 
 export function validatePhone(value: string): string | null {
-  const cleaned = value.replace(/[^\d]/g, '');
+  const trimmed = value.trim();
 
-  if (!RUSSIAN_PHONE_REGEX.test(cleaned)) {
+  if (!trimmed || !PHONE_ALLOWED_CHARS_REGEX.test(trimmed)) {
+    return 'Введите номер в формате +7XXXXXXXXXX';
+  }
+
+  const digits = trimmed.replace(/\D/g, '');
+
+  if (!PHONE_DIGITS_REGEX.test(digits)) {
     return 'Введите номер в формате +7XXXXXXXXXX';
   }
 
