@@ -5,3 +5,9 @@
   justify-content: center;
   padding: 24px 16px;
 }
+
+@media (max-width: 480px) {
+  .page {
+    padding: 16px 12px;
+  }
+}
