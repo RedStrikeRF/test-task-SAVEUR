@@ -1,0 +1,22 @@
+.card {
+  max-width: 400px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.title {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.button {
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+}
