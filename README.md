@@ -103,6 +103,3 @@ function getAvailableTimeSlots(date: string, slots: string[]): string[] {
 
 ![Экран подтверждения](docs/screenshots/confirmation.png)
 
-Мобильная версия (375px):
-
-![Мобильная версия](docs/screenshots/mobile.png)
