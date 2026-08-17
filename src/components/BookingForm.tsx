@@ -25,7 +25,12 @@ export default function BookingForm() {
         onChange={(e) => setPhone(e.target.value)}
         placeholder="Телефон"
       />
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      <input
+        type="date"
+        value={date}
+        min={new Date().toISOString().split('T')[0]}
+        onChange={(e) => setDate(e.target.value)}
+      />
       <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
       <input
         type="number"
