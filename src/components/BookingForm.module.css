@@ -14,3 +14,14 @@
   padding: 10px;
   cursor: pointer;
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin: 4px 0 0;
+}

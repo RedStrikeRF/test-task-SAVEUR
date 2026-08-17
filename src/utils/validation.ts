@@ -20,6 +20,27 @@ export function validateDate(value: string): string | null {
   return null;
 }
 
+export const TIME_SLOTS = [
+  '12:00',
+  '13:00',
+  '14:00',
+  '15:00',
+  '16:00',
+  '17:00',
+  '18:00',
+  '19:00',
+  '20:00',
+  '21:00',
+  '22:00',
+];
+
+export function validateTime(value: string): string | null {
+  if (!TIME_SLOTS.includes(value)) {
+    return 'Выберите время';
+  }
+  return null;
+}
+
 export function validateGuests(value: number): string | null {
   if (!Number.isInteger(value) || value < 1 || value > 12) {
     return 'Количество гостей от 1 до 12';
