@@ -23,13 +23,16 @@ export function validateName(value: string): string | null {
   return null;
 }
 
+const RUSSIAN_PHONE_REGEX = /^[78]\d{10}$/;
+
 export function validatePhone(value: string): string | null {
-  // убираем пробелы, скобки и дефисы, проверяем только цифры
-  const digits = value.replace(/\D/g, '');
-  if (digits.length === 11 && (digits[0] === '7' || digits[0] === '8')) {
-    return null;
+  const cleaned = value.replace(/[^\d]/g, '');
+
+  if (!RUSSIAN_PHONE_REGEX.test(cleaned)) {
+    return 'Введите номер в формате +7XXXXXXXXXX';
   }
-  return 'Введите номер в формате +7XXXXXXXXXX';
+
+  return null;
 }
 
 export function validateDate(value: string): string | null {
